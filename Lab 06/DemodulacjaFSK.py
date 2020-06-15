@@ -19,44 +19,44 @@ def FSK():
     return FSK
 
 def demo():
-    demodulatoFSK0=[] ; demodulatoFSK1=[]
+    DemoX1=[] ; DemoX2=[]
     for i,j in zip(FSK,t):
-        demodulatoFSK0.append(i* A1 * np.sin(2 * np.pi *f1*j + fi))
+        DemoX1.append(i* A1 * np.sin(2 * np.pi *f1*j + fi))
 
     for i,j in zip(FSK,t):
-        demodulatoFSK1.append(i* A1 * np.sin(2 * np.pi *f2*j + fi))
+        DemoX2.append(i* A1 * np.sin(2 * np.pi *f2*j + fi))
 
-    integralFSK0 = []
+    pt1 = []
     for i in range(z1):
         x0 = 0
         for j in range(50):
-            x0 = x0 + demodulatoFSK0[(i * 50) + j]
-        integralFSK0.append(x0)
+            x0 = x0 + DemoX1[(i * 50) + j]
+        pt1.append(x0)
 
-    integralFSK1 = []
+    pt2 = []
     for i in range(z1):
         x1 = 0
         for j in range(50):
-            x1 = x1 + demodulatoFSK1[(i * 50) + j]
-        integralFSK1.append(x1)
+            x1 = x1 + DemoX2[(i * 50) + j]
+        pt2.append(x1)
 
-    integral_FULL_FSK = []
+    pt = []
     for i in range(z1):
-        integral_FULL_FSK.append(integralFSK0[i] - integralFSK1[i])
+        pt.append(pt1[i] - pt2[i])
 
-    interpolatingFSK=interp1d(x, integral_FULL_FSK, kind='previous')
+    interpolatingFSK=interp1d(x, pt, kind='previous')
     FSK_pt=interpolatingFSK(t)
 
-    return demodulatoFSK0,demodulatoFSK1,FSK_pt
+    return DemoX1,DemoX2,FSK_pt
 
-def wartoscProgowa (pt_key,h):
-    tab_wart_prog = []
-    for p in pt_key:
+def wartoscProgowa (pt,h):
+    wp = []
+    for p in pt:
         if p < h:
-            tab_wart_prog.append(1)
+            wp.append(1)
         else:
-            tab_wart_prog.append(0)
-    return tab_wart_prog
+            wp.append(0)
+    return wp
 
 mt=Binary('Kamil')
 plt.figure()
@@ -66,26 +66,28 @@ t = np.linspace(0,z1,prb1);x = np.linspace(0,z1,z1);h=10
 
 interpolacja = interp1d(x, mt, kind='previous')
 TBs = interpolacja(t)
-plt.subplot(611)
+plt.subplot(511)
+plt.title('sygnal wejsciowy')
 plt.plot(t,TBs)
 
 FSK=FSK()
-plt.subplot(612)
+plt.subplot(512)
+plt.title('FSK')
 plt.plot(t,FSK)
 
-[demodulatoFSK0,demodulatoFSK1,FSK_pt]=demo()
+[DemoX1,DemoX2,FSK_pt]=demo()
 FSKwp=wartoscProgowa(FSK_pt,h)
 
-plt.subplot(613)
-plt.plot(t,demodulatoFSK0)
+plt.subplot(513)
+plt.title('Demodulacja FSK x1(t)')
+plt.plot(t,DemoX1)
 
-plt.subplot(614)
-plt.plot(t,demodulatoFSK1)
+plt.subplot(514)
+plt.title('Demodulacja FSK x2(t)')
+plt.plot(t,DemoX2)
 
-plt.subplot(615)
-plt.plot(t,FSK_pt)
-
-#plt.subplot(616)
-#plt.plot(FSKwp)
+plt.subplot(515)
+plt.title('Demodulacja FSK p(t)')
+plt.plot(FSKwp)
 
 plt.show()

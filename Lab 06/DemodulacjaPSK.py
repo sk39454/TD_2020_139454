@@ -31,6 +31,7 @@ def MT(LIMIT):
                 ycords.append(1)
     xcords=np.linspace(0,1,len(ycords))
     plt.subplot(231)
+    plt.title('sygnal wejsciowy')
     plt.plot(xcords,ycords)
 
 def ZPT(mt, t, f, tb, koniec):
@@ -60,6 +61,7 @@ def ZPT(mt, t, f, tb, koniec):
               ycords.append(np.sin(ampl*(m  - 1/len(t))))
         ycords.append(0)
     plt.subplot(232)
+    plt.title('PSK')
     x=np.linspace(0, 1, len(ycords))
     plt.plot(x, ycords)
     return(ycords)
@@ -77,6 +79,7 @@ def demodulator1(Modulacja,h):
 
     xcords = np.linspace(0,1,len(Demo))
     plt.subplot(235)
+    plt.title('Demodulacja PSK x(t)')
     plt.plot(xcords,Demo)
 
     for j in range(len(mt)):
@@ -94,6 +97,7 @@ def demodulator1(Modulacja,h):
 
     xcords = np.linspace(0,0.1,len(Demov2))
     plt.subplot(236)
+    plt.title('Demodulacja PSK p(t)')
     plt.plot(xcords,Demov2)
 
     for i in range (len(Demov2)):
@@ -107,6 +111,7 @@ def demodulator1(Modulacja,h):
 
     xcords=np.linspace(0,1,len(Final))
     plt.subplot(234)
+    plt.title('Demodulacja PSK m(t)')
     plt.plot(xcords,Final)
 
 plt.figure()
@@ -118,6 +123,9 @@ LIMIT=10
 MT(len(mt))
 ycords=ZPT(mt, x, f, tb, 1)
 
+for i in range(len(ycords)):
+    if ( ycords[i] == 0):
+        print('zero')
 #ycords=ZAT(len(mt))
 demodulator1(ycords,0.2)
 plt.show()

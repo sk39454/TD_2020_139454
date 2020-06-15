@@ -31,6 +31,7 @@ def MT(LIMIT):
                 ycords.append(1)
     xcords=np.linspace(0,1,len(ycords))
     plt.subplot(231)
+    plt.title('Sygnal wejsciowy')
     plt.plot(xcords,ycords)
 
 def ASK(LIMIT):
@@ -44,6 +45,7 @@ def ASK(LIMIT):
                 ycords.append(np.sin(40*np.pi*(x  - 1/10 )*1))
     xcords=np.linspace(0,1,len(ycords))
     plt.subplot(232)
+    plt.title('ASK')
     plt.plot(xcords,ycords)
     return ycords
 
@@ -59,6 +61,7 @@ def demodulator1(Modulacja,h):
 
     xcords = np.linspace(0,1,len(Demo))
     plt.subplot(235)
+    plt.title('Demodulacja ASK x(t)')
     plt.plot(xcords,Demo)
 
     for i in range (len(Modulacja)):
@@ -70,6 +73,7 @@ def demodulator1(Modulacja,h):
 
     xcords = np.linspace(0,1,len(Demov2))
     plt.subplot(236)
+    plt.title('Demodulacja ASK p(t)')
     plt.plot(xcords,Demov2)
 
     for i in range (len(Demov2)):
@@ -83,6 +87,7 @@ def demodulator1(Modulacja,h):
 
     xcords=np.linspace(0,1,len(Final))
     plt.subplot(234)
+    plt.title('Demodulacja ASK m(t)')
     plt.plot(xcords,Final)
 
 plt.figure()
