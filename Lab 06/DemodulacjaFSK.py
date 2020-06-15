@@ -1,131 +1,91 @@
-import math
+
 import numpy as np
 import matplotlib.pyplot as plt
-import array
-import math
-import numpy as np
-import matplotlib.pyplot as plt
-import array
+from scipy.interpolate import interp1d
 
-def Uno(string,switch):
-    if (switch == 0):
-        bin = ''.join(format(i, 'b') for i in bytearray(string, encoding ='utf-8'))
-        bin = list(map(int, bin))
-        #print('variant=littleEndian\n','conversion of ', string,' to binary is equal to [ ', bin,' ]')
-        return bin
-    else:
-        rev=string[::-1]
-        bin2 = ''.join(format(i, 'b') for i in bytearray(rev, encoding ='utf-8'))
-        bin2 = list(map(int, bin2))
-        #print('variant=BigEndian\n','conversion of ', string,' to binary is equal to [ ',''.join(bin2),' ]')
-        return bin2
+def Binary(string):
+    bin = ''.join(format(i, 'b') for i in bytearray(string, encoding ='utf-8'))
+    bin = list(map(int, bin))
+    #print('variant=littleEndian\n','conversion of ', string,' to binary is equal to [ ', bin,' ]')
+    return bin
 
-def MT(LIMIT):
-    ycords=[] ; xcords = []
-    for i in range (LIMIT):
-        if(mt[i]==0):
-            for x in np.linspace(1/10,2/10):
-                ycords.append(0)
+def FSK():
+    FSK=[]
+    for i,j in zip(TBs,t):
+        if i == 1:
+            FSK.append(A1 * np.sin(2 * np.pi *f*j + fi))
+        if i==0:
+             FSK.append(A1 * np.sin(2 * np.pi *f1*j + fi))
+    return FSK
+
+def demo():
+    demodulatoFSK0=[] ; demodulatoFSK1=[]
+    for i,j in zip(FSK,t):
+        demodulatoFSK0.append(i* A1 * np.sin(2 * np.pi *f1*j + fi))
+
+    for i,j in zip(FSK,t):
+        demodulatoFSK1.append(i* A1 * np.sin(2 * np.pi *f2*j + fi))
+
+    integralFSK0 = []
+    for i in range(z1):
+        x0 = 0
+        for j in range(50):
+            x0 = x0 + demodulatoFSK0[(i * 50) + j]
+        integralFSK0.append(x0)
+
+    integralFSK1 = []
+    for i in range(z1):
+        x1 = 0
+        for j in range(50):
+            x1 = x1 + demodulatoFSK1[(i * 50) + j]
+        integralFSK1.append(x1)
+
+    integral_FULL_FSK = []
+    for i in range(z1):
+        integral_FULL_FSK.append(integralFSK0[i] - integralFSK1[i])
+
+    interpolatingFSK=interp1d(x, integral_FULL_FSK, kind='previous')
+    FSK_pt=interpolatingFSK(t)
+
+    return demodulatoFSK0,demodulatoFSK1,FSK_pt
+
+def wartoscProgowa (pt_key,h):
+    tab_wart_prog = []
+    for p in pt_key:
+        if p < h:
+            tab_wart_prog.append(1)
         else:
-            for x in np.linspace(1/10,2/10):
-                ycords.append(1)
-    xcords=np.linspace(0,1,len(ycords))
-    plt.plot(xcords,ycords)
+            tab_wart_prog.append(0)
+    return tab_wart_prog
 
-def ASK(mt,LIMIT,Amp):
-    ycords=[] ; xcords = []
-    for i in range (LIMIT):
-        if(mt[i]==0):
-            for x in np.linspace(1/10,2/10):
-                ycords.append(0)
-        else:
-            for x in np.linspace(1/10,2/10):
-                ycords.append(np.sin(40*np.pi*(x  - 1/10 )*Amp))
-    xcords=np.linspace(0,1,len(ycords))
-    plt.plot(xcords,ycords)
-    return ycords
-
-def Duo(mt):
-    mt2=[]
-    for i in range(len(mt)):
-        if (mt[i]==0):
-            mt2.append(1)
-        else:
-            mt2.append(0)
-    return mt2
-
-def Join(A,B):
-    for i in range (len(A)):
-        if(A[i]==0):
-            A[i]=B[i]
-    return A
-
-def demodulator(A,B,h):
-    sum=0 ; sum2=0 ; Demo1=[]; Demo2=[]; fcplus=[]; fcminus=[]; Final=[]
-    sumabs= 0; Demov2=[]
-    for i in range(len(A)):
-        sum=sum+A[i]
-        Demo1.append(sum)
-        sum2=sum2+B[i]
-        Demo2.append(sum2)
-
-    for i in range(len(A)):
-        fcplus.append(Demo2[i]-Demo1[i])
-        fcminus.append(Demo1[i]-Demo2[i])
-
-    plt.subplot(242)
-    xcords=np.linspace(0,1,len(fcplus))
-    plt.plot(xcords,fcplus)
-
-    plt.subplot(243)
-    xcords=np.linspace(0,1,len(fcminus))
-    plt.plot(xcords,fcminus)
-
-    plt.subplot(248)
-    C=Join(A,B)
-    plt.plot(C)
-
-    for j in range(len(mt)):
-        if(mt[j]==0):
-            for i in range (len(A)):
-                if(A[i]<0):
-                    sumabs=sumabs+A[i]
-                    Demov2.append(sumabs)
-        else:
-            for i in range (len(A)):
-                if(A[i]>0):
-                    sumabs=sumabs+A[i]
-                    Demov2.append(sumabs)
-        sumabs=0
-
-    for i in range (len(Demov2)):
-        roundmt=round(Demov2[i],0)
-        if(roundmt<=0):
-            for x in np.linspace(1/10,2/10):
-                Final.append(0)
-        else:
-            for x in np.linspace(1/10,2/10):
-                Final.append(1)
-
-    xcords=np.linspace(0,1,len(Final))
-    plt.subplot(245)
-    plt.plot(xcords,Final)
-
+mt=Binary('Kamil')
 plt.figure()
-mt=Uno('Kamil',0)
-mt=[0,1,1,0,1,0]
-mt2=Duo(mt)
-LIMIT=6 ; tb=0.1 ; N=10 ; f=N*(tb**(-1)) ; f0=(N+1)/tb ; f1=(N+2)/tb ; A=1 ; A1=0 ; A2=1
+fi0=0 ; fi1=np.pi;fi = np.pi;A1=1;A2=0.3;Tb=1 ;N=1/Tb;f = N * (Tb ** -1)
+f1 = (N + 1)/Tb;f2 = (N + 2)/Tb;x=50;z1=len(mt);prb=x*(z1/Tb);prb1=int(prb)
+t = np.linspace(0,z1,prb1);x = np.linspace(0,z1,z1);h=10
 
-plt.subplot(241)
-MT(LIMIT)
+interpolacja = interp1d(x, mt, kind='previous')
+TBs = interpolacja(t)
+plt.subplot(611)
+plt.plot(t,TBs)
 
-plt.subplot(246)
-ycords1=ASK(mt,LIMIT,1)
-A1=ycords1
-plt.subplot(247)
-ycords2=ASK(mt2,LIMIT,0.5)
-A2=ycords2
-demodulator(A1,A2,0.2)
+FSK=FSK()
+plt.subplot(612)
+plt.plot(t,FSK)
+
+[demodulatoFSK0,demodulatoFSK1,FSK_pt]=demo()
+FSKwp=wartoscProgowa(FSK_pt,h)
+
+plt.subplot(613)
+plt.plot(t,demodulatoFSK0)
+
+plt.subplot(614)
+plt.plot(t,demodulatoFSK1)
+
+plt.subplot(615)
+plt.plot(t,FSK_pt)
+
+#plt.subplot(616)
+#plt.plot(FSKwp)
 
 plt.show()

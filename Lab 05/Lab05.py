@@ -2,92 +2,119 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 import array
+import math
+import numpy as np
+import matplotlib.pyplot as plt
+import array
 
-def Zadanie(Ka,Kp):
-    fm=5;fn=100;a=1
-    xcords = [] ; ycords = [] ; ycords1 = [] ; ycords2 = []
-    x=0
-    while x <= a:
-      xcords.append(x)
-      MT = 1 * math.sin(2 * math.pi * fm * x)
-      ycords.append(MT)
-      ZA = (Ka*MT+1)*np.cos(2 * math.pi * fn * x)
-      ycords1.append(ZA)
-      ZT = np.cos(2 * math.pi * fn * x + Kp*MT)
-      ycords2.append(ZT)
-      x=x+0.001
-      x=round(x,4)
-    ZAW = np.fft.rfft(ycords1)
-    ZTW = np.fft.rfft(ycords2)
+def Binary(string,switch):
+    if (switch == 0):
+        bin = ''.join(format(i, 'b') for i in bytearray(string, encoding ='utf-8'))
+        bin = list(map(int, bin))
+        #print('variant=littleEndian\n','conversion of ', string,' to binary is equal to [ ', bin,' ]')
+        return bin
+    else:
+        rev=string[::-1]
+        bin2 = ''.join(format(i, 'b') for i in bytearray(rev, encoding ='utf-8'))
+        bin2 = list(map(int, bin2))
+        #print('variant=BigEndian\n','conversion of ', string,' to binary is equal to [ ',''.join(bin2),' ]')
+        return bin2
 
-    plt.figure()
-    plt.subplot(511), plt.title('Pure tone'),plt.xlabel('Time'), plt.ylabel('Signal Strength'), plt.plot(xcords,ycords)
-    plt.subplot(512), plt.title('AM modulation'),plt.xlabel('Time'), plt.ylabel('Signal Strength'), plt.plot(xcords,ycords1)
-    plt.subplot(513), plt.title('PM modulation'),plt.xlabel('Time'), plt.ylabel('Signal Strength'), plt.plot(xcords,ycords2)
-    plt.subplot(514)
-    if 1>Ka>0:
-        plt.xlim(90,110)
-        plt.ylim(-50)
-        plt.title('AM spectrum')
-        plt.xlabel('Frequency')
-        plt.ylabel('Decibels')
-        plt.stem(ZAW,use_line_collection=True)
-        plt.subplot(515)
-        plt.xlim(90,100)
-        plt.ylim(-250)
-        plt.title('PM spectrum')
-        plt.xlabel('Frequency')
-        plt.ylabel('Decibels')
-        plt.stem(ZTW,use_line_collection=True)
-        plt.show()
-    if  12>Ka>2:
-        plt.xlim(90,110)
-        plt.ylim(-70)
-        plt.title('AM spectrum')
-        plt.xlabel('Frequency')
-        plt.ylabel('Decibels')
-        plt.stem(ZAW,use_line_collection=True)
-        plt.subplot(515)
-        plt.xlim(89,96)
-        plt.ylim(-50)
-        plt.title('PM spectrum')
-        plt.xlabel('Frequency')
-        plt.ylabel('Decibels')
-        plt.stem(ZTW,use_line_collection=True)
-        plt.show()
-    if  Ka>12:
-        plt.xlim(90,115)
-        plt.ylim(-300)
-        plt.title('AM spectrum')
-        plt.xlabel('Frequency')
-        plt.ylabel('Decibels')
-        plt.stem(ZAW,use_line_collection=True)
-        plt.subplot(515)
-        plt.xlim(0,200)
-        plt.ylim(-150)
-        plt.title('PM spectrum')
-        plt.xlabel('Frequency')
-        plt.ylabel('Decibels')
-        plt.stem(ZTW,use_line_collection=True)
-        plt.show()
+def bandwidth(A):
+    X=np.amax(A)
+    Y=np.amin(A)
+    return (abs(abs(X)-abs(Y)))
 
-    pasmo1=[] ; pasmo2=[]
-    for i in range(len(ZTW)):
-        if(ZTW[i]>=-3):
-            pasmo1.append(ycords1[i])
-    for i in range(len(ZAW)):
-        if(ZAW[i]>=-3):
-            pasmo2.append(ycords2[i])
-    fmin1=np.min(pasmo1) ; fmin2=np.min(pasmo2)
-    fmax1=np.max(pasmo1) ; fmax2=np.max(pasmo2)
-    w1 = fmax1-fmin1 ; w2 = fmax2-fmin1
-    #wyniki dla podpunktu pierwszego
-    #w1 = 2.993 w 2.493
-    #wyniki dla podpunktu drugiego
-    #w1 = 23.864 w 12.864
-    #wyniki dla podpunktu trzeciego
-    #w1 = 69.581 w 35.581
+def MT(LIMIT):
+    ycords=[] ; xcords = []
+    for i in range (LIMIT):
+        if(mt[i]==0):
+            for x in np.linspace(1/10,2/10):
+                ycords.append(0)
+        else:
+            for x in np.linspace(1/10,2/10):
+                ycords.append(1)
+    xcords=np.linspace(0,1,len(ycords))
+    plt.subplot(421)
+    plt.plot(xcords,ycords)
+    plt.subplot(422)
+    plt.plot(xcords,ycords) #Place Holder
 
-#Zadanie(0.5,1.5)
-Zadanie(11,1.4)
-Zadanie(34,43)
+def ZAT(LIMIT):
+    ycords=[]
+    for i in range (LIMIT):
+        if(mt[i]==0):
+            for x in np.linspace(1/10,2/10):
+                ycords.append(0)
+        else:
+            for x in np.linspace(1/10,2/10):
+                ycords.append(np.sin(40*np.pi*(x  - 1/10 )))
+    xcords=np.linspace(0,1,len(ycords))
+    plt.subplot(423)
+    plt.plot(xcords,ycords)
+    spectrum = np.fft.rfft(ycords)
+    xcords = np.linspace(0,1,len(spectrum))
+    plt.subplot(424) , plt.xlim(0,0.17)
+    plt.plot(xcords,spectrum)
+    ycords=np.array(ycords)
+    bw=bandwidth(ycords)
+    #bw 1.1102230246251565e-16
+def ZFT(LIMIT):
+    ycords=[] ; xcords = []
+    for i in range (LIMIT):
+        if(mt[i]==0):
+            for x in np.linspace(1/10,2/10):
+                ycords.append(np.sin(40*np.pi*(x  - 1/10 )))
+        else:
+            for x in np.linspace(1/10,2/10):
+                ycords.append(np.sin(80*np.pi*(x  - 1/10 )))
+    xcords=np.linspace(0,1,len(ycords))
+    plt.subplot(425)
+    plt.plot(xcords,ycords)
+    spectrum = np.fft.rfft(ycords)
+    xcords = np.linspace(0,1,len(spectrum))
+    plt.subplot(426) , plt.xlim(0,0.24)
+    plt.plot(xcords,spectrum)
+    ycords=np.array(ycords)
+    bw=bandwidth(ycords)
+    #bw 1.1102230246251565e-16
+
+def ZPT(LIMIT):
+    ycords=[] ; xcords = []
+    for i in range (LIMIT):
+        if(mt[i]==0):
+            for x in np.linspace(1/10,2/10):
+                ycords.append(np.sin(20*np.pi*(x  + 0 )))
+        else:
+            for x in np.linspace(1/10,2/10):
+                ycords.append(np.sin(20*np.pi*(x  - np.pi )))
+    xcords=np.linspace(0,1,len(ycords))
+    plt.subplot(427)
+    plt.plot(xcords,ycords)
+    spectrum = np.fft.rfft(ycords)
+    xcords = np.linspace(0,1,len(spectrum))
+    plt.subplot(428) , plt.xlim(0,0.1)
+    plt.plot(xcords,spectrum)
+    ycords=np.array(ycords)
+    bw=bandwidth(ycords)
+    #bw 0.00037399113886860125
+
+plt.figure()
+mt=Binary('Lama MA KOTA',0)
+#LIMIT=len(mt)
+LIMIT=10
+print(mt)
+tb=0.1
+N=2
+f=N*(tb**(-1))
+f0=(N+1)/tb
+f1=(N+2)/tb
+A=1
+A1=0
+A2=1
+MT(LIMIT)
+ZAT(LIMIT)
+ZFT(LIMIT)
+ZPT(LIMIT)
+plt.subplot(422).remove()
+plt.show()

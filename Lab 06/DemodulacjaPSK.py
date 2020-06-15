@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import array
 
-def Uno(string,switch):
+def Binary(string,switch):
     if (switch == 0):
         bin = ''.join(format(i, 'b') for i in bytearray(string, encoding ='utf-8'))
         bin = list(map(int, bin))
@@ -110,7 +110,7 @@ def demodulator1(Modulacja,h):
     plt.plot(xcords,Final)
 
 plt.figure()
-mt=Uno('AB',0)
+mt=Binary('AB',0)
 mt=[0,1,1,0,1,0]
 x=np.linspace(0, 1, len(mt), endpoint=False)
 tb=0.1 ;N=10;f=N*(tb**(-1));f0=(N+1)/tb;f1=(N+2)/tb;A=1;A1=0;A2=1
@@ -118,9 +118,6 @@ LIMIT=10
 MT(len(mt))
 ycords=ZPT(mt, x, f, tb, 1)
 
-for i in range(len(ycords)):
-    if ( ycords[i] == 0):
-        print('zero')
 #ycords=ZAT(len(mt))
 demodulator1(ycords,0.2)
 plt.show()
